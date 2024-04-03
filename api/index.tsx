@@ -1,24 +1,15 @@
 import { Button, Frog, TextInput } from 'frog'
 import { devtools } from 'frog/dev'
 import { serveStatic } from 'frog/serve-static'
-// import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
 
-// Uncomment to use Edge Runtime.
-// export const config = {
-//   runtime: 'edge',
-// }
+export const app = new Frog({});
 
-export const app = new Frog({
-  assetsPath: '/',
-  basePath: '/api',
-  // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
-})
+app.use('/*', serveStatic({ root: './public' }));
 
-app.frame('/', (c) => {
+app.frame('/api', (c) => {
   const { buttonValue, inputText, status } = c
-  const fruit = inputText || buttonValue
+  const fruit = inputText || buttonValue;
   return c.res({
     image: (
       <div
@@ -66,9 +57,7 @@ app.frame('/', (c) => {
   })
 })
 
-// @ts-ignore
-const isEdgeFunction = typeof EdgeFunction !== 'undefined'
-const isProduction = isEdgeFunction || import.meta.env?.MODE !== 'development'
+const isProduction = import.meta.env?.MODE !== 'development'
 devtools(app, isProduction ? { assetsPath: '/.frog' } : { serveStatic })
 
 export const GET = handle(app)
